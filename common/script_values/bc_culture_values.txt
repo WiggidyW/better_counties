@@ -1,0 +1,15 @@
+bc_total_development = {
+	value = 0
+	every_in_list = {
+		variable = counties
+		add = development_level
+	}
+}
+
+bc_total_counties = {
+	value = 0
+	every_in_list = {
+		variable = counties
+		add = 1
+	}
+}

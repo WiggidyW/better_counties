@@ -1,0 +1,30 @@
+bc_set_culture_capital = {
+	if = {
+		limit = {
+			any_in_list = {
+				variable = counties
+				count > 0
+			}
+		}
+		ordered_in_list = {
+			variable = counties
+			order_by = development_level
+			position = 0
+			development_level = {
+				save_temporary_scope_as = highest
+			}
+		}
+		random_in_list = {
+			variable = counties
+			limit = { development_level >= scope:highest }
+			save_temporary_scope_as = this_county
+		}
+		set_variable = {
+			name = capital
+			value = scope:this_county
+		}
+	}
+	else = {
+		remove_variable = capital
+	}
+}

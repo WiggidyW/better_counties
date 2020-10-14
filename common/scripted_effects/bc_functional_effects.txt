@@ -1,0 +1,123 @@
+# COUNTY - The county to be converted
+# CULTURE - The culture being converted to
+bc_culture_convert_county_effect = {
+	$COUNTY$ = {
+		set_variable = {
+			name = previous_culture
+			value = $COUNTY$.culture
+		}
+		set_county_culture = $CULTURE$
+	}
+	$CULTURE$ = {
+		set_variable = {
+			name = newest_county
+			value = $COUNTY$
+		}
+	}
+	bc_update_culture_titles_effect = {
+		COUNTY = $COUNTY$
+		OLD_CULTURE = $COUNTY$.var:previous_culture
+	}
+	$CULTURE$ = {
+		bc_set_culture_capital = {} # yes?
+	}
+	$COUNTY$.var:previous_culture = {
+		bc_set_culture_capital = {} # yes?
+	}
+}
+
+# COUNTY - The county to be converted
+# FAITH - The faith being converted to
+bc_faith_convert_county_effect = {
+	$COUNTY$ = {
+		set_variable = {
+			name = previous_faith
+			value = $COUNTY$.faith
+		}
+		set_county_faith = $FAITH$
+	}
+}
+
+# COUNTY - The county for which the culture was changed
+# OLD_CULTURE - The culture that was switched from
+bc_update_culture_titles_effect = {
+	$COUNTY$.culture = {
+		add_to_variable_list = {
+			name = counties
+			target = $COUNTY$
+		}
+		if = {
+			limit = {
+				NOT = {
+					is_target_in_variable_list = {
+						name = duchies
+						target = $COUNTY$.duchy
+					}
+				}
+			}
+			add_to_variable_list = {
+				name = duchies
+				target = $COUNTY$.duchy
+			}
+		}
+	}
+	$OLD_CULTURE$ = {
+		remove_list_variable = {
+			name = counties
+			target = $COUNTY$
+		}
+		if = {
+			limit = {
+				$COUNTY$.duchy = {
+					any_in_de_jure_hierarchy = {
+						continue = { tier > tier_county }
+						AND = {
+							tier = tier_county
+							culture = $OLD_CULTURE$
+						}
+						count < 0
+					}
+				}
+			}
+			remove_list_variable = {
+				name = duchies
+				target = $COUNTY$.duchy
+			}
+		}
+	}
+}
+
+# TRIGGER - The Trigger restricting whether a county can or can not be chosen
+# CHARACTER - The Ruler for whom a sub-realm county will be culture converted to their culture
+bc_culture_convert_most_bordered_county_effect = {
+	$CHARACTER$ = {
+		ordered_sub_realm_county = {
+			limit = {
+				NOT = { culture = $CHARACTER$.culture }
+				$TRIGGER$ = yes
+			}
+			order_by = {
+				every_title_to_title_neighboring_county = {
+					limit = { culture = $CHARACTER$.culture }
+					add = development_level
+					add = 1
+				}
+			}
+			position = 0
+			random_title_to_title_neighboring_county = {
+				limit = { culture = $CHARACTER$.culture }
+				faith = {
+					save_temporary_scope_as = this_faith
+				}
+			}
+			bc_culture_convert_county_effect = {
+				COUNTY = this
+				CULTURE = $CHARACTER$.culture
+			}
+			bc_faith_convert_county_effect = {
+				COUNTY = this
+				FAITH = scope:this_faith
+			}
+		}
+	}
+}

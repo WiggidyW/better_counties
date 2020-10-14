@@ -1,0 +1,48 @@
+﻿on_game_start = {
+	on_actions = {
+		populate_culture_title_list_action
+	}
+}
+
+on_county_culture_change = {
+	on_actions = {
+		modify_culture_title_list_action
+	}
+}
+
+populate_culture_title_list_action = {
+	effect = {
+		every_county = {
+			save_temporary_scope_as = this_county
+			culture = {
+				add_to_variable_list = {
+					name = counties
+					target = scope:this_county
+				}
+				if = {
+					limit = {
+						NOT = {
+							is_target_in_variable_list = {
+								name = duchies
+								target = scope:this_county.duchy
+							}
+						}
+					}
+					add_to_variable_list = {
+						name = duchies
+						target = scope:this_county.duchy
+					}
+				}
+			}
+		}
+	}
+}
+
+modify_culture_title_list_action = {
+	effect = {
+		bc_on_culture_changed_fix_lists_effect = {
+			COUNTY = this
+			OLD_CULTURE = scope:old_culture
+		}
+	}
+}
